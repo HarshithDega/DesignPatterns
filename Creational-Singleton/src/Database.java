@@ -1,16 +1,24 @@
 public class Database {
     private String data;
-    private static Database instance;
+    private static volatile Database instance;
 
     private Database(String data) {
         this.data = data;
     }
+
     public static Database getInstance(String data) {
-        if(instance==null) {
-            instance = new Database(data);
+        Database result = instance;
+        if (result == null) {
+            synchronized (Database.class) {
+                result = instance;
+                if (result == null) {
+                    instance = result = new Database(data);
+                }
+            }
         }
-        return instance;
+        return result;
     }
+
     public String toString() {
         return "Data: %s".formatted(data);
     }
